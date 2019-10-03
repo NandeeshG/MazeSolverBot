@@ -3,12 +3,12 @@
 // connect motor controller pins to Arduino digital pins
 // motor one
 int enA = 10;  //with PWM
-int inA1 = 9;
-int inA2 = 8;
+int inA1 = 9;  //digital
+int inA2 = 8;  //digital
 // motor two
 int enB = 5;  //with PWM
-int inB1 = 7;
-int inB2 = 6;
+int inB1 = 7; //digital
+int inB2 = 6; //digital
 
 void setup()
 {
