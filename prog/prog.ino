@@ -21,6 +21,10 @@ int LFSensor[5]={0, 0, 0, 0, 0};
 int error=0,P=0,I=0,D=0,previousError=0,PIDvalue=0;
 int iniMotorPower=256/2;
 const int Kp=50, Ki=25, Kd=25;
+const int STOPPED = 0;
+const int FOLLOWING_LINE = 1;
+const int NO_LINE = 2;
+int mode = FOLLOWING_LINE;
 
 void motorA(int speed=0)
 {
@@ -64,6 +68,24 @@ void motorB(int speed=0)
     analogWrite(enB, abs(speed)%256);
 }
 
+void botLeft(int time=0)
+{
+    motorA(-(256/2));
+    motorB(256/2);
+    delay(time);
+    motorA();
+    motorB();
+}
+
+void botRight(int time=0)
+{
+    motorA((256/2));
+    motorB(-(256/2));
+    delay(time);
+    motorA();
+    motorB();
+}   
+
 void readSensors()
 {
     //when bot is in perfect position, array is 00100
@@ -76,6 +98,19 @@ void readSensors()
     LFSensor[3] = digitalRead(lineFollowSensor3);
     LFSensor[4] = digitalRead(lineFollowSensor4);
     
+    if((LFSensor[0]== 1 )&&(LFSensor[1]== 1 )&&(LFSensor[2]== 1 )
+        &&(LFSensor[3]== 1 )&&(LFSensor[4]== 1 )) 
+    {
+        mode = STOPPED;
+        return;
+    }
+    else if((LFSensor[0]== 0 )&&(LFSensor[1]== 0 )&&(LFSensor[2]== 0 )
+        &&(LFSensor[3]== 0 )&&(LFSensor[4]== 0 )) 
+    { 
+        mode = NO_LINE;
+        return;
+    }
+
     if((LFSensor[0]== 0 )&&(LFSensor[1]== 0 )&&(LFSensor[2]== 0)
         &&(LFSensor[3]== 0 )&&(LFSensor[4]== 1 ))
         error = 4;
@@ -103,6 +138,7 @@ void readSensors()
     else if((LFSensor[0]== 1 )&&(LFSensor[1]== 0 )&&(LFSensor[2]== 0)
         &&(LFSensor[3]== 0 )&&(LFSensor[4]== 0 )) 
         error = -4;
+    mode = FOLLOWING_LINE;
 }
 
 void calculatePID()
@@ -144,8 +180,21 @@ void setup()
 // the loop function runs over and over again forever
 void loop()
 {
-    readSensors(); 
-    // read sensors, storage values at Sensor Array and calculate "error"
-    calculatePID(); 
-    motorPIDcontrol();
+    readSensors();
+    switch (mode)
+    {
+      case STOPPED:
+         motorA();
+         motorB();
+         break;
+      case NO_LINE:
+         motorA();
+         motorB();
+         botLeft(180); 
+         break;
+      case FOLLOWING_LINE:
+         calculatePID();
+         motorPIDcontrol();
+         break;
+    }
 }
