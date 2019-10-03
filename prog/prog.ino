@@ -18,8 +18,8 @@ const int lineFollowSensor4 = 19;
 const byte buttonPin = 9;
 const byte ledPin = 13;
 int LFSensor[5]={0, 0, 0, 0, 0};
-int error=0,P,I,D,previousError,PIDvalue;
-int iniMotorPower;
+int error=0,P=0,I=0,D=0,previousError=0,PIDvalue=0;
+int iniMotorPower=256/2;
 const int Kp=50, Ki=25, Kd=25;
 
 void motorA(int speed=0)
@@ -68,6 +68,8 @@ void readSensors()
 {
     //when bot is in perfect position, array is 00100
     //this means IR returns 1 when line below is WHITE
+    // 0 is leftmost for bot
+    // 4 is rightmost for bot
     LFSensor[0] = digitalRead(lineFollowSensor0);
     LFSensor[1] = digitalRead(lineFollowSensor1);
     LFSensor[2] = digitalRead(lineFollowSensor2);
@@ -129,6 +131,7 @@ void setup()
     pinMode(inA2, OUTPUT);
     pinMode(inB1, OUTPUT);
     pinMode(inB2, OUTPUT);
+    // led and buttons
     pinMode(ledPin, OUTPUT);
     pinMode(buttonPin, INPUT_PULLUP);
     
